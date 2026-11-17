@@ -8,7 +8,7 @@
 | `runner` | in a short-lived helper process next to the server, with the app's automation objects already connected | apps with an outside automation interface: AutoCAD and other COM apps, Archicad (JSON API), Tekla (.NET) |
 | `revit`, `unreal` | inside the app, through a channel the app already has | pyRevit Routes, Unreal Python remote execution |
 
-Every app is one entry in `src/omnibridge/registry.py`.
+Every app is one entry in `src/workit/registry.py`.
 
 ## The in-app bridge protocol
 
@@ -23,7 +23,7 @@ Request:
 
 - `op`: `ping`, `exec` or `screenshot` (`path`, `width`, `height`).
 - `mode`: `read` or `modify`. Only `modify` is wrapped in the host's undo step.
-- `token`: the contents of `~/.omnibridge/token`. A request without it is refused. A
+- `token`: the contents of `~/.workit/token`. A request without it is refused. A
   request that is not valid JSON on its first line is dropped without an answer, so a
   browser cannot smuggle one in.
 
@@ -45,7 +45,7 @@ to five. `cad_apps` lists them and every tool takes an optional `instance` port.
 ## The main-thread problem
 
 Every one of these apps requires its API to be called from its main thread, while a
-network request arrives on another thread. `omnibridge_core.py` (one dependency-free
+network request arrives on another thread. `workit_core.py` (one dependency-free
 file, Python 2.7 to 3.13) solves this once:
 
 - the socket thread only parses the request and puts a job in a queue;
@@ -60,10 +60,10 @@ as connected.
 
 ## Adding an app with a Python console
 
-1. Write a shim of about 60 lines next to the others in `src/omnibridge/bridges/`:
+1. Write a shim of about 60 lines next to the others in `src/workit/bridges/`:
 
    ```python
-   import omnibridge_core as core
+   import workit_core as core
    bridge = core.Bridge(
        "myapp", 47910,
        namespace={"api": the_apps_module},     # names scripts can use
@@ -74,7 +74,7 @@ as connected.
    bridge.start()
    ```
 2. Add an `App(...)` entry with `kind="socket"` and the same port to `registry.py`.
-3. Add an installer in `installers.py` that copies the shim and `omnibridge_core.py`
+3. Add an installer in `installers.py` that copies the shim and `workit_core.py`
    into the app's auto-load folder.
 4. Write `skills/myapp.md`: names, units, five recipes, the traps you hit.
 5. Run `pytest`: the consistency tests check that the port, the app id, the skill and

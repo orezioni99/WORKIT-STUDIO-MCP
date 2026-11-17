@@ -10,16 +10,16 @@ import time
 
 import pytest
 
-from omnibridge import adapters
-from omnibridge.bridges._core import omnibridge_core as core
-from omnibridge.registry import App
+from workit import adapters
+from workit.bridges._core import workit_core as core
+from workit.registry import App
 
 FAKE = App("fakecad", "Fake CAD", "socket", "Python", port=47990)
 
 
 @pytest.fixture()
 def host(tmp_path, monkeypatch):
-    monkeypatch.setenv("OMNIBRIDGE_HOME", str(tmp_path))
+    monkeypatch.setenv("WORKIT_HOME", str(tmp_path))
     undo_labels = []
 
     def wrap(fn, label):
@@ -27,7 +27,7 @@ def host(tmp_path, monkeypatch):
         return fn()
 
     def shoot(path, width, height):
-        from omnibridge.wincapture import _png
+        from workit.wincapture import _png
 
         with open(path, "wb") as handle:
             handle.write(_png(2, 1, b"\xff\x00\x00\x00\xff\x00"))
@@ -88,7 +88,7 @@ def test_errors_come_back_with_traceback(host):
     reply = adapters.execute(FAKE, "print('before')\n1 / 0", "read", 10)
     assert reply["ok"] is False
     assert "ZeroDivisionError" in reply["error"]
-    assert "<omnibridge>" in reply["traceback"]
+    assert "<workit>" in reply["traceback"]
     assert "before" in reply["stdout"]
 
 
@@ -124,7 +124,7 @@ def test_http_request_is_dropped_without_running_anything(host):
 
 
 def test_busy_host_times_out_cleanly(tmp_path, monkeypatch):
-    monkeypatch.setenv("OMNIBRIDGE_HOME", str(tmp_path))
+    monkeypatch.setenv("WORKIT_HOME", str(tmp_path))
     bridge = core.Bridge("fakecad", FAKE.port)  # nobody pumps: the "app" is frozen
     assert bridge.start()
     try:
@@ -148,7 +148,7 @@ def test_second_instance_takes_the_next_port(host):
 
 
 def test_wake_is_called_instead_of_polling(tmp_path, monkeypatch):
-    monkeypatch.setenv("OMNIBRIDGE_HOME", str(tmp_path))
+    monkeypatch.setenv("WORKIT_HOME", str(tmp_path))
     holder = {}
     bridge = core.Bridge("fakecad", FAKE.port, wake=lambda: holder["bridge"].pump())
     holder["bridge"] = bridge

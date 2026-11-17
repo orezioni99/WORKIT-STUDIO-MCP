@@ -1,6 +1,6 @@
 # Prompts to try
 
-Start with "Use OmniBridge." so the model reaches for the right tools.
+Start with "Use WORKIT STUDIO MCP." so the model reaches for the right tools.
 
 ## First contact
 

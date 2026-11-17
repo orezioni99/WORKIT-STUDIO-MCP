@@ -6,22 +6,22 @@ from pathlib import Path
 
 import pytest
 
-from omnibridge import installers
-from omnibridge.registry import APPS, find
+from workit import installers
+from workit.registry import APPS, find
 
-ROOT = Path(str(resources.files("omnibridge")))
+ROOT = Path(str(resources.files("workit")))
 
 BRIDGE_FILES = {
     "blender": "bridges/blender/__init__.py",
-    "rhino": "bridges/rhino/omnibridge_rhino.py",
-    "3dsmax": "bridges/max/omnibridge_max.py",
-    "sketchup": "bridges/sketchup/omnibridge.rb",
-    "freecad": "bridges/freecad/OmniBridge/omnibridge_freecad.py",
-    "maya": "bridges/maya/omnibridge_maya.py",
-    "fusion": "bridges/fusion/OmniBridge/OmniBridge.py",
-    "c4d": "bridges/c4d/omnibridge/omnibridge.pyp",
-    "houdini": "bridges/houdini/scripts/python/omnibridge_houdini.py",
-    "qgis": "bridges/qgis/omnibridge/__init__.py",
+    "rhino": "bridges/rhino/workit_rhino.py",
+    "3dsmax": "bridges/max/workit_max.py",
+    "sketchup": "bridges/sketchup/workit.rb",
+    "freecad": "bridges/freecad/WorkitStudio/workit_freecad.py",
+    "maya": "bridges/maya/workit_maya.py",
+    "fusion": "bridges/fusion/WorkitStudio/WorkitStudio.py",
+    "c4d": "bridges/c4d/workit/workit.pyp",
+    "houdini": "bridges/houdini/scripts/python/workit_houdini.py",
+    "qgis": "bridges/qgis/workit/__init__.py",
 }
 
 
@@ -51,8 +51,8 @@ def test_bridge_port_and_name_match_the_registry(app_id, relative):
 
 
 @pytest.mark.parametrize("relative", [p for p in BRIDGE_FILES.values() if not p.endswith(".rb")]
-                         + ["bridges/revit/OmniBridge.extension/startup.py",
-                            "bridges/_core/omnibridge_core.py"])
+                         + ["bridges/revit/WorkitStudio.extension/startup.py",
+                            "bridges/_core/workit_core.py"])
 def test_bridge_python_parses(relative):
     ast.parse((ROOT / relative).read_text("utf-8"))
 

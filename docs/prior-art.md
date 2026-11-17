@@ -2,7 +2,7 @@
 
 Surveyed on 2026-11-14. Stars and licences are from the GitHub API on that day and will
 drift. "No licence file" means the repository cannot legally be reused as-is, whatever
-its README says. OmniBridge includes no code from any of these projects.
+its README says. WORKIT STUDIO MCP includes no code from any of these projects.
 
 ## What changed in 2026: vendors now ship their own servers
 
@@ -22,8 +22,8 @@ its README says. OmniBridge includes no code from any of these projects.
 | IfcOpenShell `ifcopenshell-mcp` | 0.9.0 | Headless IFC editing, no app needed |
 | Bentley MicroStation MCP | Early access | Restricted users |
 
-**Where OmniBridge fits:** these servers are each tied to one app, often to its newest
-version and sometimes to a paid plan or a single AI client. OmniBridge gives one
+**Where WORKIT STUDIO MCP fits:** these servers are each tied to one app, often to its newest
+version and sometimes to a paid plan or a single AI client. WORKIT STUDIO MCP gives one
 uniform interface across apps and versions (AutoCAD 2024, Revit 2023, Archicad 25,
 Blender 3.x ...) and across clients. Where a vendor server exists and fits your
 version, it is a good choice for that app; the two can be installed side by side, but
@@ -38,17 +38,17 @@ drive a given model with one at a time.
 
 ### Revit
 - [mcp-servers-for-revit/mcp-servers-for-revit](https://github.com/mcp-servers-for-revit/mcp-servers-for-revit): MIT, ~450 stars. C# add-in, WebSocket.
-- [mcp-servers-for-revit/mcp-server-for-revit-python](https://github.com/mcp-servers-for-revit/mcp-server-for-revit-python): MIT. pyRevit Routes, the same channel OmniBridge uses.
+- [mcp-servers-for-revit/mcp-server-for-revit-python](https://github.com/mcp-servers-for-revit/mcp-server-for-revit-python): MIT. pyRevit Routes, the same channel WORKIT STUDIO MCP uses.
 - [Sam-AEC/aec-model-bridge](https://github.com/Sam-AEC/aec-model-bridge): GPL-3.0. Large tool set.
 
 ### Archicad
-- [ENZYME-APD/tapir-archicad-automation](https://github.com/ENZYME-APD/tapir-archicad-automation): MIT. The add-on OmniBridge calls.
+- [ENZYME-APD/tapir-archicad-automation](https://github.com/ENZYME-APD/tapir-archicad-automation): MIT. The add-on WORKIT STUDIO MCP calls.
 - [SzamosiMate/tapir-archicad-MCP](https://github.com/SzamosiMate/tapir-archicad-MCP): MIT. Generated Tapir commands behind list / schema / call tools.
 - [lgradisar/archicad-mcp](https://github.com/lgradisar/archicad-mcp): MIT.
 
 ### Navisworks
 - [HorizunGroup/naviscoord-mcp](https://github.com/HorizunGroup/naviscoord-mcp): MIT. .NET add-in, 53 tools.
-- [bimwright/nwd-mcp](https://github.com/bimwright/nwd-mcp): Apache-2.0. In-process plug-in with C# execution. This in-process route reaches Clash Detective, which OmniBridge's COM route cannot.
+- [bimwright/nwd-mcp](https://github.com/bimwright/nwd-mcp): Apache-2.0. In-process plug-in with C# execution. This in-process route reaches Clash Detective, which WORKIT STUDIO MCP's COM route cannot.
 
 ### Rhino and Grasshopper
 - [jingcheng-chen/rhinomcp](https://github.com/jingcheng-chen/rhinomcp): MIT, ~1.2k stars. C# plug-in, script execution, Grasshopper tools.
@@ -58,7 +58,7 @@ drive a given model with one at a time.
 
 ### SketchUp
 - [mhyrr/sketchup-mcp](https://github.com/mhyrr/sketchup-mcp): ~550 stars, no licence file. Ruby extension, `eval_ruby`.
-- [zinin/sketchup-mcp2](https://github.com/zinin/sketchup-mcp2): MIT. Timer-driven Ruby server, the same threading approach OmniBridge uses.
+- [zinin/sketchup-mcp2](https://github.com/zinin/sketchup-mcp2): MIT. Timer-driven Ruby server, the same threading approach WORKIT STUDIO MCP uses.
 
 ### Blender
 - [ahujasid/blender-mcp](https://github.com/ahujasid/blender-mcp): MIT, ~34k stars. The project that popularised the add-on + socket pattern.
@@ -79,13 +79,13 @@ drive a given model with one at a time.
 - [PatrickPalmer/MayaMCP](https://github.com/PatrickPalmer/MayaMCP): MIT.
 - [ttiimmaacc/cinema4d-mcp](https://github.com/ttiimmaacc/cinema4d-mcp): MIT.
 - [healkeiser/fxhoudinimcp](https://github.com/healkeiser/fxhoudinimcp): MIT.
-- [runreal/unreal-mcp](https://github.com/runreal/unreal-mcp): MIT. Uses Python remote execution, as OmniBridge does.
+- [runreal/unreal-mcp](https://github.com/runreal/unreal-mcp): MIT. Uses Python remote execution, as WORKIT STUDIO MCP does.
 
 ### Multi-app projects
 - The `dcc-mcp` GitHub organisation publishes adapters for Maya, 3ds Max, Houdini and Cinema 4D.
 - [Cai-aa/CAD-Agent-Hub](https://github.com/Cai-aa/CAD-Agent-Hub): MIT. CATIA, SOLIDWORKS, NX, Fusion.
 
-## Design choices OmniBridge took from this survey
+## Design choices WORKIT STUDIO MCP took from this survey
 
 - **Own port range (47810-47909).** Port 9876 is the default of at least five other
   projects (Blender, SketchUp, Houdini, FreeCAD, Fusion), so they collide.

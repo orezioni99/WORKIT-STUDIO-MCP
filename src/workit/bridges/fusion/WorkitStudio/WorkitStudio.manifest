@@ -1,0 +1,11 @@
+{
+  "autodeskProduct": "Fusion",
+  "type": "addin",
+  "id": "",
+  "author": "Workit Studio (based on OmniBridge)",
+  "description": {"": "Lets an AI assistant run scripts in Fusion through the WORKIT STUDIO MCP server"},
+  "version": "0.1.0",
+  "runOnStartup": true,
+  "supportedOS": "windows|mac",
+  "editEnabled": true
+}

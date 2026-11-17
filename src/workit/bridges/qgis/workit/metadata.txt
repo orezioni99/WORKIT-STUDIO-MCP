@@ -1,0 +1,11 @@
+[general]
+name=WorkitStudio
+qgisMinimumVersion=3.28
+qgisMaximumVersion=4.99
+description=Lets an AI assistant run PyQGIS scripts through the WORKIT STUDIO MCP server
+about=Listens on 127.0.0.1 only and runs scripts sent by the local WORKIT STUDIO MCP server.
+version=0.1.0
+author=Workit Studio (based on OmniBridge)
+email=noreply@example.com
+category=Plugins
+experimental=True
