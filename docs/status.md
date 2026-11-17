@@ -1,76 +1,86 @@
-# What has actually been tested
+<div dir="rtl" lang="he">
 
-**About this page.** Everything under "Run end to end" was done by the upstream
-OmniBridge project before this fork was renamed to WORKIT STUDIO MCP. On the fork, as of
-2026-11-17: the automated tests pass, the renamed command line runs, and one app has
-been reached. **Revit 2025** (pyRevit 6.0, Routes): the extension loaded after a pyRevit
-reload; a read-only script returned the project's length unit (centimetres), level
-names, wall count and a Hebrew title and Hebrew string literal unchanged; a request
-without the token was refused. A modify script then created six dimension strings
-(fixture centres to wall faces) in a ceiling plan as one undo step; the values Revit
-reported matched the values computed beforehand, and a window capture showed them in
-place. These ran through `workit run`, not through an MCP client. No other app has been
-tried.
+# מה נבדק בפועל
 
-Found on first contact with Revit, and fixed: a reply containing a character from
-U+0080 to U+00FF (a degree sign in a type name) made IronPython's JSON encoder fail;
-and `workit run <app> -` lost Hebrew when the script was piped in.
+עברית · [English](en/status.md)
 
-Last updated 2026-11-15, version 0.1.0, on Windows 11 with Python 3.12 and the MCP
-Python SDK 2.3.
+## מה נבדק בפורק WORKIT STUDIO MCP
 
-## Run end to end
+נכון ל־17.11.2026, על Windows 11:
 
-| What | How it was checked |
+| מה | איך זה נבדק |
 |---|---|
-| MCP server over stdio | A real MCP client listed the five tools, read their annotations and called each one. |
-| Wire protocol and in-app core | 14 automated tests against a fake host app: results, printed output, errors with traceback, main-thread execution, undo wrapping for modify only, token refusal, dropping of non-protocol (browser) requests, busy-app timeout, second-instance port, screenshot round trip. |
-| Registry consistency | 53 automated tests: every app has a guide, every bridge file's port and id match the registry, every in-app bridge has an installer, bridge Python parses. |
-| **AutoCAD 2024** | Attached to the running app; created a layer, a closed polyline, a circle, text and an arc; read them back (area 24.0 m² for a 6 x 4 m room); ran a command line; got a clear error for a bad call; captured the window. |
-| **SOLIDWORKS 2025** (French install) | Attached; created a part; found a reference plane by type; sketched a 100 x 50 mm rectangle; extruded 20 mm; mass properties returned exactly 100 cm³; captured the window. |
-| **Revit 2026** (French install, pyRevit Routes) | Extension registered with pyRevit; created and opened a new project; in one transaction created 76 levels, 76 floors and 602 walls (a 300 m tower, each floor turned 1.2 degrees, from an outline read back from AutoCAD); opened the 3D view; captured the window. |
-| **Archicad 29** (with Tapir) | Read project info, stories and element counts; created 20 slabs (each turned 1.2 degrees, 4 m apart) and 8 columns through Tapir; counted them back; captured the window. |
-| **Blender 5.2.4** | Add-on installed by `workit install blender` and enabled from the command line; bridge answered on port 47810; built 151 mesh objects (a 75-floor tower, each floor turned 1.2 degrees) in one undo step; changed the 3D view; saved a viewport render and a viewport screenshot. |
-| **Unreal Engine 5.8** | Found the open editor by remote execution; spawned 151 actors (76 slabs and 75 floor volumes, each turned 1.2 degrees) in one editor transaction; moved the viewport camera; captured the window. |
-| Window capture | AutoCAD, SOLIDWORKS, Revit and Unreal windows captured and scaled to PNG. |
-| Installer | `install rhino` wrote its files and printed the startup line; `install blender` reported cleanly that Blender is not on the test PC. |
+| בדיקות אוטומטיות | 78 בדיקות עוברות: הפרוטוקול, ליבת הגשר, עקביות הרישום והשכבה הישראלית. |
+| שורת הפקודה אחרי שינוי השם | `workit apps`, ‏`workit config`, ‏`workit install revit` ו־`workit run` רצים. |
+| רישום ב־Claude Code | `claude mcp get workit` החזיר Connected. הכלים עצמם עוד לא הופעלו מתוך שיחה. |
+| **Revit 2025** (pyRevit 6.0, ‏Routes) – קריאה | ההרחבה נטענה אחרי Reload של pyRevit. סקריפט קריאה החזיר את יחידת האורך של הפרויקט (סנטימטרים), שמות מפלסים, מספר קירות, שם קובץ בעברית ומחרוזת עברית ללא שינוי. בקשה בלי הטוקן נדחתה. |
+| **Revit 2025** – שינוי | סקריפט שינוי יצר שש שרשרות מידות (ממרכזי גופי תאורה אל פני קירות) בתוכנית תקרה, כצעד Undo אחד. הערכים ש־Revit החזיר תאמו לערכים שחושבו מראש, וצילום החלון הראה אותן במקום. |
 
-## Written but not yet run in the real app
+הריצות מול Revit נעשו דרך `workit run` ולא דרך לקוח MCP. שום תוכנה אחרת לא נוסתה
+בפורק.
 
-These follow each vendor's documented API and share the tested core, but nobody has
-run them in the application yet. Expect small fixes on first contact.
+**באגים שהתגלו במגע הראשון עם Revit ותוקנו:**
 
-- In-app bridges: Rhino, 3ds Max, SketchUp, FreeCAD, Fusion, Maya, Cinema 4D, Houdini,
-  QGIS. Rhino, 3ds Max and SketchUp are not installed on the test PC.
-- COM apps other than AutoCAD and SOLIDWORKS: BricsCAD, ZWCAD, GstarCAD, nanoCAD,
-  Inventor, CATIA, Solid Edge, MicroStation, ETABS, SAP2000, Robot.
-- Tekla Structures (pythonnet).
-- HTTP transport (`serve --transport http`): starts through the SDK, not yet called by
-  a remote client.
+- תשובה שמכילה תו מהטווח U+0080 עד U+00FF (למשל סימן המעלות `°` בשם של טיפוס) הפילה
+  את מקודד ה־JSON של IronPython.
+- `workit run <app> -` איבד את העברית כשהסקריפט הועבר ב־pipe.
 
-## Known limits
+## מה נבדק בפרויקט המקורי, לפני הפורק
 
-- **Navisworks** uses the legacy COM API. It may fail to attach to a Navisworks the
-  user started normally, and it cannot reach Clash Detective. A proper in-process
-  plug-in is the next step for this app.
-- **Archicad** cannot run code inside the app; scripts call JSON commands, and most
-  creation commands need the Tapir add-on.
-- **Scripts are not sandboxed** in any app.
-- Windows only for COM apps and window capture. The in-app bridges are plain Python or
-  Ruby and should work on macOS, but the installer paths are Windows paths.
-- SketchUp's bridge is Ruby and could not even be syntax-checked on the test PC (no
-  Ruby installed).
-- The Cinema 4D plugin id is a placeholder and must be replaced by a registered one
-  before distribution.
-- **Revit, found on first contact:** a second Revit process (for example the hidden one
-  kept warm by Autodesk's Personal Accelerator) can take Routes port 48884 first. The
-  visible Revit then listens on 48885, and in one run its WORKIT STUDIO MCP routes were missing
-  until Revit was restarted. Not yet understood.
-- `cad_apps` reports AutoCAD as running while it is still loading; scripts fail for the
-  first seconds with "not running". Retry after the app has finished starting.
-- **Archicad, found on first contact:** creating elements on a story that is not the
-  one on screen makes Archicad show an "elements created on unseen Stories" dialog. The
-  elements are created, but every later command fails until the user clicks Continue.
-- **Blender, found on first contact:** `workit install blender` needs Blender's
-  settings folder, which a freshly unpacked Blender does not have until it has been
-  started once. On a first start the splash screen covers the viewport screenshot.
+כל מה שבסעיף הזה נעשה על ידי פרויקט OmniBridge, בגרסה 0.1.0, עודכן ב־15.11.2026, על
+Windows 11 עם Python 3.12 ו־MCP Python SDK 2.3. הוא לא הורץ מחדש בפורק.
+
+| מה | איך זה נבדק |
+|---|---|
+| שרת MCP דרך stdio | לקוח MCP אמיתי הציג את חמשת הכלים, קרא את ההערות שלהם והפעיל כל אחד. |
+| הפרוטוקול וליבת הגשר | בדיקות אוטומטיות מול תוכנה מדומה: תוצאות, פלט מודפס, שגיאות עם traceback, הרצה ב־thread הראשי, עטיפת Undo לשינוי בלבד, דחיית טוקן שגוי, זריקת בקשות שאינן בפרוטוקול (דפדפן), timeout של תוכנה עסוקה, פורט למופע שני, צילום מסך. |
+| עקביות הרישום | בדיקות אוטומטיות: לכל תוכנה יש מדריך, הפורט והמזהה של כל גשר תואמים לרישום, לכל גשר פנימי יש מתקין, קוד ה־Python של הגשרים תקין תחבירית. |
+| **AutoCAD 2024** | התחברות לתוכנה פועלת; יצירת שכבה, פוליליין סגור, עיגול, טקסט וקשת; קריאה חוזרת שלהם (שטח 24.0 מ"ר לחדר 6 × 4 מ'); הרצת שורת פקודה; שגיאה ברורה לקריאה שגויה; צילום החלון. |
+| **SOLIDWORKS 2025** (התקנה בצרפתית) | התחברות; יצירת חלק; מציאת מישור ייחוס לפי סוג; סקיצה של מלבן 100 × 50 מ"מ; שיחול 20 מ"מ; תכונות המסה החזירו בדיוק 100 סמ"ק; צילום החלון. |
+| **Revit 2026** (התקנה בצרפתית, pyRevit Routes) | ההרחבה נרשמה ב־pyRevit; נוצר ונפתח פרויקט חדש; בטרנזקציה אחת נוצרו 76 מפלסים, 76 רצפות ו־602 קירות; נפתחה תצוגת תלת־ממד; צילום החלון. |
+| **Archicad 29** (עם Tapir) | קריאת פרטי הפרויקט, הקומות וספירת אלמנטים; יצירת 20 תקרות ו־8 עמודים דרך Tapir; ספירה חוזרת; צילום החלון. |
+| **Blender 5.2.4** | התוסף הותקן על ידי `install blender` והופעל משורת הפקודה; הגשר ענה על פורט 47810; נבנו 151 אובייקטים בצעד Undo אחד; שינוי תצוגת התלת־ממד; שמירת רינדור וצילום של התצוגה. |
+| **Unreal Engine 5.8** | מציאת העורך הפתוח בהרצה מרחוק; יצירת 151 actors בטרנזקציה אחת; הזזת מצלמת התצוגה; צילום החלון. |
+| צילום חלונות | חלונות AutoCAD, ‏SOLIDWORKS, ‏Revit ו־Unreal צולמו והוקטנו ל־PNG. |
+| מתקין | `install rhino` כתב את הקבצים והדפיס את שורת ההפעלה; `install blender` דיווח בצורה ברורה כש־Blender לא היה מותקן. |
+
+## נכתב אבל עוד לא הורץ בתוכנה אמיתית
+
+החלקים האלה נכתבו לפי ה־API המתועד של כל יצרן וחולקים את הליבה שנבדקה, אבל אף אחד
+עוד לא הריץ אותם בתוכנה. צפויים תיקונים קטנים במגע הראשון.
+
+- גשרים פנימיים: Rhino, ‏3ds Max, ‏SketchUp, ‏FreeCAD, ‏Fusion, ‏Maya, ‏Cinema 4D, ‏Houdini, ‏QGIS.
+- תוכנות COM מלבד AutoCAD ו־SOLIDWORKS: ‏BricsCAD, ‏ZWCAD, ‏GstarCAD, ‏nanoCAD, ‏Inventor,
+  CATIA, ‏Solid Edge, ‏MicroStation, ‏ETABS, ‏SAP2000, ‏Robot.
+- Tekla Structures (דרך pythonnet).
+- תעבורת HTTP ‏(`serve --transport http`): עולה דרך ה־SDK, אבל עוד לא נקראה מלקוח מרוחק.
+- השכבה הישראלית: קטעי הקוד במדריכי `skills/il/` של AutoCAD, ‏SketchUp ו־QGIS לא הורצו.
+  במדריך של Revit אומתו בפועל קריאת היחידות וקריאת הקואורדינטות.
+
+## מגבלות ידועות
+
+- **Navisworks** משתמש ב־COM API הישן. ייתכן שלא יצליח להתחבר ל־Navisworks שהמשתמש
+  הפעיל רגיל, והוא לא מגיע ל־Clash Detective.
+- **Archicad** לא יכול להריץ קוד בתוך התוכנה. הסקריפטים קוראים לפקודות JSON, ורוב
+  פקודות היצירה דורשות את התוסף Tapir.
+- **הסקריפטים לא רצים בארגז חול** באף תוכנה.
+- **Windows בלבד** לתוכנות COM ולצילום חלונות. הגשרים הפנימיים הם Python או Ruby רגילים
+  ואמורים לעבוד ב־macOS, אבל נתיבי המתקין הם נתיבי Windows.
+- הגשר של SketchUp כתוב ב־Ruby ואפילו התחביר שלו לא נבדק (לא היה Ruby במחשב הבדיקה
+  של הפרויקט המקורי).
+- מזהה התוסף של Cinema 4D הוא זמני, ויש להחליף אותו במזהה רשום לפני הפצה.
+- **Revit, תהליך שני:** תהליך Revit נוסף (למשל התהליך הנסתר של Autodesk Personal
+  Accelerator) יכול לתפוס את פורט 48884 ראשון. ה־Revit הגלוי מאזין אז על 48885.
+- **Revit, רשת:** שרת ה־Routes של pyRevit מאזין על כל כרטיסי הרשת (`0.0.0.0`), ולא רק
+  על המחשב המקומי. הרצת סקריפטים מוגנת בטוקן.
+- **Revit, עסוק:** בזמן Reload של pyRevit, או כשיש דיאלוג פתוח, בקשות נתקעות עד timeout.
+- `cad_apps` מדווח ש־AutoCAD פועל בזמן שהוא עדיין בטעינה, וסקריפטים נכשלים בשניות
+  הראשונות.
+- **Archicad:** יצירת אלמנטים בקומה שאינה מוצגת פותחת דיאלוג, וכל פקודה אחריו נכשלת עד
+  שהמשתמש לוחץ Continue.
+- **Blender:** `install blender` צריך את תיקיית ההגדרות של Blender, שנוצרת רק אחרי
+  הפעלה ראשונה.
+- **תצוגת עברית בטרמינל:** `workit run` מדפיס עברית כקודי `א...`. דרך שרת ה־MCP
+  העברית עוברת כרגיל.
+
+</div>

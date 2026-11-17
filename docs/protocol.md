@@ -1,66 +1,69 @@
-# How it works, and how to add an app
+<div dir="rtl" lang="he">
 
-## Three ways to reach an app
+# איך זה עובד, ואיך מוסיפים תוכנה
 
-| Kind | Where the script runs | Used for |
+עברית · [English](en/protocol.md)
+
+## שלוש דרכים להגיע לתוכנה
+
+| סוג | איפה הסקריפט רץ | למה זה משמש |
 |---|---|---|
-| `socket` | inside the app, on its main thread | apps with their own script engine: Blender, Rhino, 3ds Max, SketchUp, FreeCAD, Maya, Fusion, Cinema 4D, Houdini, QGIS |
-| `runner` | in a short-lived helper process next to the server, with the app's automation objects already connected | apps with an outside automation interface: AutoCAD and other COM apps, Archicad (JSON API), Tekla (.NET) |
-| `revit`, `unreal` | inside the app, through a channel the app already has | pyRevit Routes, Unreal Python remote execution |
+| `socket` | בתוך התוכנה, ב־thread הראשי שלה | תוכנות עם מנוע סקריפטים משלהן: Blender, Rhino, 3ds Max, SketchUp, FreeCAD, Maya, Fusion, Cinema 4D, Houdini, QGIS |
+| `runner` | בתהליך עזר קצר־חיים ליד השרת, כשאובייקטי האוטומציה של התוכנה כבר מחוברים | תוכנות עם ממשק אוטומציה חיצוני: AutoCAD ותוכנות COM אחרות, Archicad ‏(JSON API), ‏Tekla ‏(‎.NET) |
+| `revit`, `unreal` | בתוך התוכנה, דרך ערוץ שכבר קיים בה | pyRevit Routes, הרצת Python מרחוק של Unreal |
 
-Every app is one entry in `src/workit/registry.py`.
+כל תוכנה היא רשומה אחת ב־`src/workit/registry.py`.
 
-## The in-app bridge protocol
+## פרוטוקול הגשר הפנימי
 
-One request per TCP connection, on `127.0.0.1` only. One line of JSON each way.
+בקשה אחת לכל חיבור TCP, על `127.0.0.1` בלבד. שורת JSON אחת לכל כיוון.
 
-Request:
+בקשה:
 
 ```json
 {"token": "...", "id": "ab12", "op": "exec", "code": "result = 1 + 1",
  "mode": "read", "label": "AI: add walls", "timeout": 120}
 ```
 
-- `op`: `ping`, `exec` or `screenshot` (`path`, `width`, `height`).
-- `mode`: `read` or `modify`. Only `modify` is wrapped in the host's undo step.
-- `token`: the contents of `~/.workit/token`. A request without it is refused. A
-  request that is not valid JSON on its first line is dropped without an answer, so a
-  browser cannot smuggle one in.
+- `op`: ‏`ping`, ‏`exec` או `screenshot` (עם `path`, ‏`width`, ‏`height`).
+- `mode`: ‏`read` או `modify`. רק `modify` נעטף בצעד ה־Undo של התוכנה.
+- `token`: התוכן של `~/.workit/token`. בקשה בלי הטוקן נדחית. בקשה שהשורה הראשונה שלה
+  אינה JSON תקין נזרקת בלי תשובה, כך שדפדפן לא יכול להגניב בקשה.
 
-Response:
+תשובה:
 
 ```json
 {"id": "ab12", "ok": true, "result": 2, "stdout": "", "elapsed_ms": 3}
 {"id": "ab12", "ok": false, "error": "NameError: ...", "traceback": "...", "stdout": ""}
 ```
 
-The result is the script's `result` variable if it sets one, otherwise the value of
-its last expression. Values JSON cannot carry come back as their `repr`.
+התוצאה היא המשתנה `result` של הסקריפט אם הוא הוגדר, ואחרת הערך של הביטוי האחרון.
+ערכים ש־JSON לא יכול לשאת חוזרים כ־`repr` שלהם. התשובה נבנית כ־JSON ב־ASCII בלבד
+(`ascii_json`), כי המקודד של IronPython 2.7 נכשל על תווים מ־U+0080 עד U+00FF.
 
-Ports: each app has a base port (Blender 47810, Rhino 47820, 3ds Max 47830,
-SketchUp 47840, FreeCAD 47850, Maya 47860, Fusion 47870, Cinema 4D 47880,
-Houdini 47890, QGIS 47900). A second instance of the same app takes the next port, up
-to five. `cad_apps` lists them and every tool takes an optional `instance` port.
+פורטים: לכל תוכנה יש פורט בסיס (Blender 47810, ‏Rhino 47820, ‏3ds Max 47830,
+SketchUp 47840, ‏FreeCAD 47850, ‏Maya 47860, ‏Fusion 47870, ‏Cinema 4D 47880,
+Houdini 47890, ‏QGIS 47900). מופע שני של אותה תוכנה מקבל את הפורט הבא, עד חמישה.
+`cad_apps` מציג אותם, וכל כלי מקבל פרמטר `instance` אופציונלי.
 
-## The main-thread problem
+## בעיית ה־thread הראשי
 
-Every one of these apps requires its API to be called from its main thread, while a
-network request arrives on another thread. `workit_core.py` (one dependency-free
-file, Python 2.7 to 3.13) solves this once:
+כל אחת מהתוכנות האלה דורשת שה־API שלה ייקרא מה־thread הראשי, בעוד שבקשת רשת מגיעה
+ב־thread אחר. הקובץ `workit_core.py` (קובץ אחד בלי תלויות, Python 2.7 עד 3.13) פותר את
+זה פעם אחת:
 
-- the socket thread only parses the request and puts a job in a queue;
-- the host shim makes the app call `bridge.pump()` on its main thread, either from a
-  timer (Blender `bpy.app.timers`, Qt `QTimer` in 3ds Max, FreeCAD, QGIS) or on demand
-  through a `wake` callback (Rhino `InvokeOnUiThread`, Maya `executeDeferred`, Fusion
-  custom events, Cinema 4D `SpecialEventAdd`, Houdini `hdefereval`);
-- the socket thread waits for the job and sends the answer.
+- ה־thread של ה־socket רק מפענח את הבקשה ושם משימה בתור;
+- שכבת ההתאמה גורמת לתוכנה לקרוא ל־`bridge.pump()` ב־thread הראשי שלה, מתוך טיימר
+  (`bpy.app.timers` ב־Blender, ‏`QTimer` של Qt ב־3ds Max, ‏FreeCAD ו־QGIS) או לפי דרישה
+  דרך קריאת `wake` ‏(`InvokeOnUiThread` ב־Rhino, ‏`executeDeferred` ב־Maya, אירועים
+  מותאמים ב־Fusion, ‏`SpecialEventAdd` ב־Cinema 4D, ‏`hdefereval` ב־Houdini);
+- ה־thread של ה־socket ממתין למשימה ושולח את התשובה.
 
-A `ping` is answered by the socket thread itself, so an app that is busy still shows
-as connected.
+על `ping` עונה ה־thread של ה־socket בעצמו, כך שתוכנה עסוקה עדיין מוצגת כמחוברת.
 
-## Adding an app with a Python console
+## הוספת תוכנה שיש לה קונסולת Python
 
-1. Write a shim of about 60 lines next to the others in `src/workit/bridges/`:
+1. כותבים שכבת התאמה של כ־60 שורות, ליד האחרות ב־`src/workit/bridges/`:
 
    ```python
    import workit_core as core
@@ -73,25 +76,28 @@ as connected.
    )
    bridge.start()
    ```
-2. Add an `App(...)` entry with `kind="socket"` and the same port to `registry.py`.
-3. Add an installer in `installers.py` that copies the shim and `workit_core.py`
-   into the app's auto-load folder.
-4. Write `skills/myapp.md`: names, units, five recipes, the traps you hit.
-5. Run `pytest`: the consistency tests check that the port, the app id, the skill and
-   the installer all agree.
+2. מוסיפים ל־`registry.py` רשומת `App(...)` עם `kind="socket"` ואותו פורט.
+3. מוסיפים ב־`installers.py` מתקין שמעתיק את שכבת ההתאמה ואת `workit_core.py` לתיקיית
+   הטעינה האוטומטית של התוכנה.
+4. כותבים את `skills/myapp.md`: שמות, יחידות, חמש דוגמאות, והמלכודות שנתקלתם בהן.
+   תוספת ישראלית, אם צריך, נכתבת ב־`skills/il/myapp.md`.
+5. מריצים `pytest`: בדיקות העקביות מוודאות שהפורט, מזהה התוכנה, המדריך והמתקין
+   מתאימים זה לזה.
 
-## Adding a COM app
+## הוספת תוכנת COM
 
-Add an `App(...)` entry with `runner="com"` and its ProgID, plus a small "flavour"
-function in `runners/com.py` that names the objects scripts get. The runner attaches
-to the running app, registers a COM message filter so a busy app is retried rather
-than failing with "call was rejected by callee", runs the script and exits.
+מוסיפים רשומת `App(...)` עם `runner="com"` וה־ProgID שלה, ופונקציית "flavour" קטנה
+ב־`runners/com.py` שנותנת שמות לאובייקטים שהסקריפטים מקבלים. ה־runner מתחבר לתוכנה
+הפועלת, רושם מסנן הודעות COM כדי שתוכנה עסוקה תקבל ניסיון חוזר במקום להיכשל עם
+"call was rejected by callee", מריץ את הסקריפט ויוצא.
 
-## Tests
+## בדיקות
 
 ```bash
 pytest
 ```
 
-The protocol tests use a fake host: a plain thread that plays an app's main thread.
-They need no CAD software.
+בדיקות הפרוטוקול משתמשות בתוכנה מדומה: thread רגיל שמשחק את ה־thread הראשי של תוכנה.
+הן לא דורשות שום תוכנת CAD.
+
+</div>

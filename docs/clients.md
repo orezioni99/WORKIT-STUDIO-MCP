@@ -1,27 +1,30 @@
-# Connecting an AI client
+<div dir="rtl" lang="he">
 
-`workit config <client>` prints the snippet with the right path for your machine.
-This page explains what each client can and cannot do. Config locations were checked
-against each vendor's documentation in November 2026; they change, so trust the
-vendor's page if it disagrees.
+# חיבור לקוח AI
 
-## Clients that start WORKIT STUDIO MCP themselves (easiest)
+עברית · [English](en/clients.md)
 
-These run on your PC and launch the server as a local program (stdio). Nothing is
-exposed to the network.
+הפקודה `workit config <client>` מדפיסה את ההגדרה עם הנתיב הנכון למחשב שלכם. הדף הזה
+מסביר מה כל לקוח יכול ומה לא. מיקומי קובצי ההגדרות נבדקו מול התיעוד של כל יצרן
+בנובמבר 2026. הם משתנים, ולכן אם דף היצרן אומר אחרת, סמכו עליו.
 
-| Client | Where the entry goes |
+## לקוחות שמפעילים את השרת בעצמם (הכי פשוט)
+
+הלקוחות האלה רצים על המחשב שלכם ומפעילים את השרת כתוכנה מקומית (stdio). שום דבר לא
+נחשף לרשת.
+
+| לקוח | איפה שמים את ההגדרה |
 |---|---|
-| Claude Desktop | `%APPDATA%\Claude\claude_desktop_config.json` (Settings > Developer > Edit Config) |
+| Claude Desktop | `%APPDATA%\Claude\claude_desktop_config.json` ‏(Settings > Developer > Edit Config) |
 | Claude Code | `claude mcp add workit -- workit` |
 | Cursor | `%USERPROFILE%\.cursor\mcp.json` |
-| VS Code + GitHub Copilot | `.mcp.json` in the workspace root |
+| VS Code עם GitHub Copilot | `.mcp.json` בתיקיית השורש של סביבת העבודה |
 | Gemini CLI | `%USERPROFILE%\.gemini\settings.json` |
 | Antigravity | `%USERPROFILE%\.gemini\config\mcp_config.json` |
 | Codex CLI | `%USERPROFILE%\.codex\config.toml` |
-| LM Studio (local models) | Program tab > Install > Edit mcp.json |
+| LM Studio (מודלים מקומיים) | לשונית Program > Install > Edit mcp.json |
 
-All except Codex use the same JSON shape:
+כולם, חוץ מ־Codex, משתמשים באותו מבנה JSON:
 
 ```json
 {
@@ -31,7 +34,7 @@ All except Codex use the same JSON shape:
 }
 ```
 
-Codex uses TOML:
+Codex משתמש ב־TOML:
 
 ```toml
 [mcp_servers.workit]
@@ -39,34 +42,35 @@ command = "workit"
 args = []
 ```
 
-If the client cannot find `workit`, use the full path that
-`workit config <client>` prints.
+אם הלקוח לא מוצא את `workit`, השתמשו בנתיב המלא ש־`workit config <client>` מדפיס.
+כשהשרת מותקן בתוך `.venv` של הפרויקט, זה בדרך כלל המצב.
 
-## Clients that need a URL
+## לקוחות שצריכים כתובת URL
 
-ChatGPT, the Gemini app, Claude.ai custom connectors and Open WebUI cannot start a
-program on your PC. Run the server in HTTP mode:
+ChatGPT, אפליקציית Gemini, מחברים מותאמים ב־Claude.ai ו־Open WebUI לא יכולים להפעיל
+תוכנה על המחשב שלכם. מריצים את השרת במצב HTTP:
 
 ```bash
 workit serve --transport http --port 8765
 ```
 
-It is then at `http://127.0.0.1:8765/mcp`.
+השרת זמין אז בכתובת `http://127.0.0.1:8765/mcp`.
 
-- **Open WebUI and other tools on the same PC** can use that address directly
-  (from Docker: `http://host.docker.internal:8765/mcp`).
-- **ChatGPT, the Gemini app and Claude.ai connectors** run in the vendor's cloud, so
-  they need a public HTTPS address that forwards to your PC: OpenAI's Secure MCP
-  Tunnel, or a tunnel such as cloudflared or ngrok. Add the resulting
-  `https://.../mcp` address as a custom MCP server in the client.
+- **Open WebUI וכלים אחרים על אותו מחשב** יכולים להשתמש בכתובת הזו ישירות
+  (מתוך Docker: `http://host.docker.internal:8765/mcp`).
+- **ChatGPT, אפליקציית Gemini ומחברי Claude.ai** רצים בענן של היצרן, ולכן הם צריכים
+  כתובת HTTPS ציבורית שמעבירה למחשב שלכם: Secure MCP Tunnel של OpenAI, או tunnel כמו
+  cloudflared או ngrok. את הכתובת שמתקבלת (`https://.../mcp`) מוסיפים בלקוח כשרת MCP
+  מותאם.
 
-**Read this before opening a tunnel.** WORKIT STUDIO MCP's HTTP mode has no login. Anyone who
-can reach the address can run scripts in your CAD apps. Use a tunnel that enforces
-authentication, never post the address, and stop the tunnel when you finish. For daily
-work prefer a client from the first table.
+**קראו לפני שפותחים tunnel.** למצב ה־HTTP אין התחברות. כל מי שמגיע לכתובת יכול להריץ
+סקריפטים בתוכנות ה־CAD שלכם. השתמשו ב־tunnel שאוכף אימות, אל תפרסמו את הכתובת, וסגרו
+את ה־tunnel כשסיימתם. לעבודה יומיומית עדיף לקוח מהטבלה הראשונה.
 
-## Local models
+## מודלים מקומיים
 
-Any local model works through a client that speaks MCP: LM Studio, or Ollama behind
-Open WebUI or `ollmcp`. Results depend heavily on the model: scripting a CAD API needs
-a strong coding model. `cad_skill` exists to give smaller models the facts they lack.
+כל מודל מקומי עובד דרך לקוח שמדבר MCP: ‏LM Studio, או Ollama מאחורי Open WebUI או
+`ollmcp`. התוצאות תלויות מאוד במודל: כתיבת סקריפטים ל־API של תוכנת CAD דורשת מודל קוד
+חזק. הכלי `cad_skill` קיים כדי לתת למודלים קטנים את העובדות שחסרות להם.
+
+</div>

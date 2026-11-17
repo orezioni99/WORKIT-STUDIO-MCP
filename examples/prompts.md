@@ -1,44 +1,65 @@
-# Prompts to try
+<div dir="rtl" lang="he">
 
-Start with "Use WORKIT STUDIO MCP." so the model reaches for the right tools.
+# בקשות לדוגמה
 
-## First contact
+עברית · [English](../docs/en/prompts.md)
 
-- Which CAD apps are open on my PC right now, and which could you control if I
-  started them?
+התחילו ב"השתמש ב־WORKIT STUDIO MCP", כדי שהמודל יפנה לכלים הנכונים. אפשר לכתוב בעברית
+רגילה. בפעמים הראשונות עבדו על עותק של הקובץ.
 
-## AutoCAD
+## היכרות ראשונה
 
-- In AutoCAD, draw a 6 x 4 m room on a new layer A-WALL with 200 mm thick walls and a
-  900 mm door opening in the south wall. Show me a screenshot when done.
-- Count every entity in this drawing by type and layer, and tell me which layers are
-  empty.
-- Find all text smaller than 2.5 mm and list where it is. Do not change anything.
+- אילו תוכנות CAD פתוחות אצלי עכשיו, ובאילו תוכל לשלוט אם אפעיל אותן?
 
 ## Revit
 
-- How many walls, doors and windows does this model have per level?
-- List every door whose Mark is empty, then fill them in as D-001, D-002 ... by level.
-- Which rooms have no number? Do not change anything.
+- כמה קירות, דלתות וחלונות יש במודל בכל מפלס?
+- באילו יחידות הפרויקט עובד, ומה המפלסים והגבהים שלהם?
+- אילו חדרים הם בלי מספר? אל תשנה כלום.
+- מצא את כל הדלתות שה־Mark שלהן ריק, ומלא אותן לפי מפלס: D-001, ‏D-002 וכן הלאה.
+- בתצוגה הפתוחה, הוסף מידות מהספוטים שבחדר האמבטיה אל פני הקירות, באותו סגנון מידה
+  שכבר קיים בתצוגה. הראה לי צילום מסך בסוף.
+- האם מוגדרות בקובץ קואורדינטות ברשת ישראל (ITM)? אם כן, מה הקואורדינטות של נקודת האפס?
+- חשב את השטח של כל ממ"ד במודל והצג טבלה. אל תקבע אם הוא עומד בתקן.
+
+## AutoCAD
+
+- באילו יחידות השרטוט הזה משורטט, סנטימטרים או מטרים? בדוק לפי מידות קיימות.
+- ספור את כל האובייקטים בשרטוט לפי סוג ושכבה, ואמור לי אילו שכבות ריקות.
+- שרטט חדר של 6 × 4 מ' בשכבה חדשה בשם "קירות", עם קירות בעובי 20 ס"מ ופתח דלת של
+  90 ס"מ בקיר הדרומי. הראה לי צילום מסך בסוף.
+- מצא את כל הטקסטים הקטנים מ־2.5 מ"מ ופרט איפה הם. אל תשנה כלום.
+- יש בשרטוט טקסט בעברית שנקרא כג'יבריש? דווח לי, בלי לתקן.
+
+## SketchUp
+
+- באילו יחידות המודל מוצג, ואילו תגיות (Tags) יש בו?
+- בנה שולחן פשוט: פלטה של 160 × 80 ס"מ בעובי 4 ס"מ, על ארבע רגליים מרובעות של 5 ס"מ
+  בגובה 72 ס"מ. אחר כך הראה לי את התצוגה.
+- האם למודל מוגדר מיקום גאוגרפי בישראל? אני רוצה לעשות בדיקת הצללה.
 
 ## Archicad
 
-- Give me the project name, the stories with their elevations, and the number of
-  elements of each type.
-- Select every wall thinner than 10 cm so I can review them.
+- תן לי את שם הפרויקט, את הקומות עם הגבהים שלהן, ואת מספר האלמנטים מכל סוג.
+- בחר את כל הקירות הדקים מ־10 ס"מ, כדי שאעבור עליהם.
 
-## Blender / Rhino / SketchUp / 3ds Max
+## Blender / Rhino / 3ds Max
 
-- Build a simple table: a 1.6 x 0.8 m top, 40 mm thick, on four 50 mm square legs
-  720 mm high. Then show me the viewport.
-- Rhino: loft a surface through three circles of radius 2, 3 and 1 m at heights 0, 4
-  and 8 m, and tell me its area.
+- Rhino: צור משטח Loft דרך שלושה עיגולים ברדיוס 2, 3 ו־1 מ' בגבהים 0, 4 ו־8 מ', ואמור
+  לי מה השטח שלו.
 
-## Across apps (the reason this is one server)
+## QGIS
 
-- Read the room names and areas from the open Revit model and write them as a table
-  of text in a new AutoCAD drawing.
-- Take the outline of the building footprint from AutoCAD and extrude it 9 m in
-  Blender.
-- Compare the number of columns in the Archicad project with the number in the Revit
-  model and tell me which levels disagree.
+- באיזו מערכת קואורדינטות כל שכבה בפרויקט? סמן שכבות שאינן ברשת ישראל החדשה.
+- השכבה הזו מציגה עברית כג'יבריש. תקן את קידוד הקריאה, בלי לשנות את הנתונים.
+- חשב את השטח של כל חלקה בדונמים.
+
+## בין תוכנות (הסיבה שזה שרת אחד)
+
+- קרא את שמות החדרים והשטחים מהמודל הפתוח ב־Revit, וכתוב אותם כטבלת טקסט בשרטוט
+  AutoCAD חדש.
+- קח את קו המתאר של הבניין מ־AutoCAD ובנה ממנו נפח בגובה 9 מ' ב־SketchUp.
+- השווה את מספר העמודים בפרויקט Archicad למספר העמודים במודל Revit, ואמור לי באילו
+  מפלסים יש אי־התאמה.
+
+</div>
