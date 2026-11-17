@@ -162,3 +162,12 @@ def test_wake_is_called_instead_of_polling(tmp_path, monkeypatch):
 def test_screenshot_round_trip(host):
     data = adapters.screenshot(FAKE, 640, 480)
     assert data.startswith(b"\x89PNG")
+
+
+def test_ascii_json_survives_latin1_hebrew_and_emoji():
+    # IronPython's json.dumps fails on characters U+0080..U+00FF (the degree sign in a
+    # fixture name broke a Revit reply), so replies are escaped by the core itself.
+    value = {"ok": True, "result": [u"Spot 36°", u"קיר", u"m² \U0001F600"]}
+    text = core.ascii_json(value)
+    assert all(ord(ch) < 128 for ch in text)
+    assert json.loads(text) == value

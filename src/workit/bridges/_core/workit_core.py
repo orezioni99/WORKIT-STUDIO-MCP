@@ -160,6 +160,29 @@ def to_jsonable(value, depth=0):
     return _safe_repr(value)
 
 
+def _escape(char):
+    code = ord(char)
+    if code < 128:
+        return char
+    if code > 0xFFFF:  # outside the BMP: JSON wants a surrogate pair
+        code -= 0x10000
+        return "\\u%04x\\u%04x" % (0xD800 + (code >> 10), 0xDC00 + (code & 0x3FF))
+    return "\\u%04x" % code
+
+
+def ascii_json(value):
+    """JSON text with every non-ASCII character escaped.
+
+    Same output as json.dumps(value), built without its ASCII encoder: under
+    IronPython 2.7 that encoder raises on any character from U+0080 to U+00FF
+    (a degree sign or a superscript two in an element name is enough).
+    """
+    text = json.dumps(value, ensure_ascii=False)
+    if not isinstance(text, text_type):
+        text = text.decode("utf-8")
+    return "".join(_escape(char) for char in text)
+
+
 def _safe_repr(value):
     try:
         return repr(value)
@@ -404,7 +427,7 @@ class Bridge(object):
 
     def _send(self, conn, response):
         try:
-            payload = json.dumps(response)
+            payload = ascii_json(response)
         except Exception:
             payload = json.dumps({"ok": False, "error": "response was not serialisable"})
         if not isinstance(payload, bytes):

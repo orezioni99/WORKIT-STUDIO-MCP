@@ -2,8 +2,19 @@
 
 **About this page.** Everything under "Run end to end" was done by the upstream
 OmniBridge project before this fork was renamed to WORKIT STUDIO MCP. On the fork, as of
-2026-11-17: the automated tests pass, the renamed command line runs, and nothing has
-been run inside a real app yet.
+2026-11-17: the automated tests pass, the renamed command line runs, and one app has
+been reached. **Revit 2025** (pyRevit 6.0, Routes): the extension loaded after a pyRevit
+reload; a read-only script returned the project's length unit (centimetres), level
+names, wall count and a Hebrew title and Hebrew string literal unchanged; a request
+without the token was refused. A modify script then created six dimension strings
+(fixture centres to wall faces) in a ceiling plan as one undo step; the values Revit
+reported matched the values computed beforehand, and a window capture showed them in
+place. These ran through `workit run`, not through an MCP client. No other app has been
+tried.
+
+Found on first contact with Revit, and fixed: a reply containing a character from
+U+0080 to U+00FF (a degree sign in a type name) made IronPython's JSON encoder fail;
+and `workit run <app> -` lost Hebrew when the script was piped in.
 
 Last updated 2026-11-15, version 0.1.0, on Windows 11 with Python 3.12 and the MCP
 Python SDK 2.3.

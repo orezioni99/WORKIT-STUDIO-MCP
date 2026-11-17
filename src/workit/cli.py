@@ -74,7 +74,8 @@ def _run(args) -> int:
     from . import adapters
     from .registry import find
 
-    code = sys.stdin.read() if args.code == "-" else args.code
+    # stdin is read as UTF-8 whatever the console code page, so Hebrew survives a pipe
+    code = sys.stdin.buffer.read().decode("utf-8-sig") if args.code == "-" else args.code
     try:
         reply = adapters.execute(find(args.app), code, "modify" if args.modify else "read",
                                  args.timeout)

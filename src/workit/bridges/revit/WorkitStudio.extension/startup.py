@@ -53,4 +53,6 @@ def execute(request, uiapp):
             return value
     reply = core.run_script(data.get("code") or "", _scope, wrap,
                             data.get("label") or "WorkitStudio")
-    return routes.make_response(data=reply)
+    # Routes serialises with IronPython's json, which fails on U+0080..U+00FF:
+    # hand it ASCII-only JSON text; the server decodes the extra layer.
+    return routes.make_response(data=core.ascii_json(reply))
